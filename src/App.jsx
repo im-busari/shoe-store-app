@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useReducer } from "react";
 import { Routes, Route } from 'react-router-dom';
 import "./App.css";
 import Footer from "./Footer";
@@ -6,35 +6,16 @@ import Header from "./Header";
 import Products from "./pages/Products";
 import Detail from "./pages/Detail";
 import Cart from "./pages/Cart";
+import cartReducer from "./reducers/cartReducer";
 import Checkout from "./pages/Checkout";
 
 export default function App() {
-  const [cart, setCart] = useState([]);
+  const [cart, dispatch] = useReducer(cartReducer, []);
 
-  const addToCart = (id, sku) => {
-    setCart((items) => {
-      const itemInCart = items.find((item) => item.sku === sku);
-      if (itemInCart) {
-        // return new array with the matching item in place
-        return items.map((i) => i.sku === sku ? {...i, quantity: i.quantity + 1} : i);
-      } else {
-        // Return new array with the new item appended
-        return [...items, { id, sku, quantity: 1  }]
-      }
-    })
-  }
 
-  const updateQuantity = (sku, quantity) => {
-    setCart((items) => {
-      return quantity === 0 
-        ? items.filter((i) => i.sku !== sku)
-        : items.map((i) => i.sku === sku ? { ...i, quantity} : i);
-    })
-  }
 
-  const emptyCart = () => {
-    setCart([]);
-  }
+
+
 
   return (
     <>
@@ -44,9 +25,9 @@ export default function App() {
           <Routes>
             <Route path="/" element={<h1>Welcome...</h1>} />
             <Route path="/:category" element={<Products />} />
-            <Route path="/:category/:id" element={<Detail addToCart={addToCart} />} />
-            <Route path="/cart" element={<Cart cart={cart} updateQuantity={updateQuantity} />} />
-            <Route path="/checkout" element={<Checkout cart={cart} emptyCart={emptyCart} />} />
+            <Route path="/:category/:id" element={<Detail dispatch={dispatch} />} />
+            <Route path="/cart" element={<Cart cart={cart} dispatch={dispatch} />} />
+            <Route path="/checkout" element={<Checkout cart={cart} dispatch={dispatch} />} />
           </Routes>
         </main>
       </div>
